@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Habit Tracker</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <p class="eyebrow">Daily routine</p>
+          <h1>Habit Tracker</h1>
+        </div>
+
+        <div class="topbar-actions">
+          <button id="theme-toggle" class="secondary-button theme-toggle" type="button" aria-label="Toggle dark mode">
+            Dark mode
+          </button>
+          <button id="add-habit-button" class="primary-button" type="button">Add habit</button>
+        </div>
+      </header>
+
+      <p id="error-message" class="error-message" aria-live="polite"></p>
+
+      <main class="layout">
+        <aside class="panel sidebar">
+          <div class="section-header">
+            <h2>Habits</h2>
+          </div>
+          <ul id="habit-list" class="habit-list" aria-live="polite"></ul>
+
+          <form id="habit-form" class="habit-form">
+            <h3>Create habit</h3>
+            <label>
+              <span>Name</span>
+              <input id="habit-name" name="name" type="text" maxlength="40" placeholder="Example: Workout" required />
+            </label>
+
+            <label>
+              <span>Color</span>
+              <input id="habit-color" name="color" type="color" value="#4f46e5" />
+            </label>
+
+            <button class="primary-button" type="submit">Save habit</button>
+          </form>
+        </aside>
+
+        <section class="panel calendar-panel">
+          <div class="calendar-header">
+            <button id="prev-month" class="secondary-button" type="button" aria-label="Previous month">Previous</button>
+
+            <div class="month-title">
+              <span class="month-label">Month</span>
+              <h2 id="current-month-label">Month</h2>
+            </div>
+
+            <button id="next-month" class="secondary-button" type="button" aria-label="Next month">Next</button>
+          </div>
+          <div id="calendar" class="calendar" aria-live="polite"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./utils/date_utils.js"></script>
+    <script src="./models/habit.js"></script>
+    <script src="./services/habit_api.js"></script>
+    <script src="./src/calendar_view.js"></script>
+    <script src="./src/app.js"></script>
+    <script src="./src/main.js"></script>
+  </body>
+</html>
