@@ -1,43 +1,65 @@
 # ai
 A simple repo for playing with AI stuff
 
-## Habit Tracker database
+## Habit Tracker
 
-The database image initializes a MySQL 8.4 instance with the `habitdb` database
-and the `user`, `habit`, and `habit_log` tables. MySQL listens on its default
-container port, `3306`. It also creates a `demo_user` account with the Study,
-Read, Workout, Travel, and Dance habits and reproducible sample completion data
-for August 2026.
+The Habit Tracker API uses FastAPI, SQLAlchemy, and MySQL 8.4. The database
+stores users, their habits, and per-day habit durations. All personal-resource
+endpoints require an eight-hour bearer JWT issued after registration and login.
 
-Build and run the image with a fresh data volume:
+Set local-only secrets before starting the Compose stack:
 
 ```bash
-docker build -t habitdb:local app/database
-docker run --detach \
-	--name habitdb \
-	--env MYSQL_ROOT_PASSWORD=local-root-password \
-	--publish 3306:3306 \
-	--volume habitdb-data:/var/lib/mysql \
-	habitdb:local
+export MYSQL_ROOT_PASSWORD='choose-a-local-database-password'
+export JWT_SECRET_KEY='generate-a-long-random-secret-for-local-use'
+make up-habit-tracker
 ```
 
-After the container is healthy, inspect the initialized tables:
+The API is available at `http://localhost:8001`. Stop the stack with
+`make down-habit-tracker`, or follow its logs with `make logs-habit-tracker`.
+The MySQL service is private to the Compose network. FastAPI's interactive API
+documentation is available at `http://localhost:8001/docs`.
+
+Register a user, log in, and pass the returned token as an Authorization header:
 
 ```bash
-docker exec --env MYSQL_PWD=local-root-password habitdb \
-	mysql --user=root --execute "SHOW TABLES FROM habitdb;"
+curl --request POST http://localhost:8001/auth/register \
+  --header 'Content-Type: application/json' \
+  --data '{"username":"alex","email":"alex@example.com","password":"correct-horse-battery-staple"}'
+
+curl --request POST http://localhost:8001/auth/login \
+  --header 'Content-Type: application/json' \
+  --data '{"username":"alex","password":"correct-horse-battery-staple"}'
 ```
 
-The schema and population scripts run only when MySQL starts with an empty data
-directory. The population script is safe to run again manually and does not
-duplicate its demo records. Use migrations for later schema changes, or recreate
-the named volume when working with disposable local data.
+Use `Authorization: Bearer <access_token>` for `GET`, `PATCH`, and `DELETE`
+`/users/{user_id}`; `GET` and `POST` `/users/{user_id}/habits`; and all
+`/habits/{habit_id}/logs` endpoints. The token holder can access only their own
+profile, habits, and logs. There is no global user or habit listing endpoint.
 
-Run the Docker integration tests with Docker and pytest available:
+For the complete authenticated API request/response contract, configuration
+reference, and database reset procedure, see [app/backend/README.md](app/backend/README.md).
+
+The database image initializes `habitdb` and its `user`, `habit`, and
+`habit_log` tables. Its scripts run only against an empty MySQL volume. It also
+creates a `demo_user` with sample habits and August 2026 log data; the seed
+password is a non-login placeholder, so register an API account for use with
+the backend.
+
+Run the database image and backend API integration suites with Docker and
+pytest available:
 
 ```bash
 make test-database
+make test-backend
 ```
 
-The Make target uses `.venv/bin/python` by default. Override it when needed, for
-example with `make test-database PYTHON=python3`.
+Both Make targets use `.venv/bin/python` by default. Override it when needed,
+for example with `make test-backend PYTHON=python3`.
+
+The MySQL initialization scripts run only for an empty `habitdb_data` volume. To
+reset local sample data, run `docker compose down --volumes` and then start the
+stack again with `make up-habit-tracker` and the required environment variables.
+
+The existing browser frontend is not yet compatible with this authenticated API:
+it does not register/log in, send bearer tokens, or load separate log records.
