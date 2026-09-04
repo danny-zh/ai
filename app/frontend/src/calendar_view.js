@@ -11,7 +11,7 @@
 })(typeof window !== 'undefined' ? window : globalThis, function () {
   const week_days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  function render_calendar({ habits, month_date, on_toggle_day }) {
+  function render_calendar({ habits, habit_logs_by_habit_id = {}, month_date, on_toggle_day }) {
     const calendar_element = document.getElementById('calendar');
 
     if (!calendar_element) {
@@ -79,7 +79,7 @@
 
         habits.forEach((habit) => {
           const toggle = document.createElement('button');
-          const done = habit.is_done_on(day.date_key);
+          const done = globalThis.HabitTracker.has_habit_log_on(habit_logs_by_habit_id, habit.id, day.date_key);
           toggle.type = 'button';
           toggle.className = 'mini-toggle';
           if (done) {

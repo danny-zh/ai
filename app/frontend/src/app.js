@@ -9,14 +9,33 @@
   global.HabitTracker = global.HabitTracker || {};
   Object.assign(global.HabitTracker, api);
 })(typeof window !== 'undefined' ? window : globalThis, function () {
+  /**
+   * Create the mutable UI state container.
+   * @returns {object} App state with backend-shaped habit and log records.
+   */
   function create_app_state() {
     return {
       habits: [],
+      habit_logs_by_habit_id: {},
       selected_month: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
       loading: false,
       error: '',
+      auth_mode: 'login',
+      current_user: null,
+      session: null,
       on_delete_habit: null
     };
+  }
+
+  /**
+   * Check whether a habit has a backend log for a date.
+   * @param {Object.<number, Array<{log_date: string}>>} habit_logs_by_habit_id Logs keyed by habit id.
+   * @param {number} habit_id Habit identifier.
+   * @param {string} date_key Date key in yyyy-mm-dd format.
+   * @returns {boolean} True when a log exists for the date.
+   */
+  function has_habit_log_on(habit_logs_by_habit_id, habit_id, date_key) {
+    return Boolean((habit_logs_by_habit_id[habit_id] || []).some((log) => log.log_date === date_key));
   }
 
   function render_habit_list(app_state) {
@@ -63,10 +82,11 @@
       const total_days_in_month = month_end.getDate();
       let completed_days = 0;
 
-      Object.entries(habit.entries || {}).forEach(([date_key, is_done]) => {
+      (app_state.habit_logs_by_habit_id[habit.id] || []).forEach((log) => {
+        const date_key = log.log_date;
         const date = new Date(`${date_key}T00:00:00`);
         const within_month = date >= month_start && date <= month_end;
-        if (within_month && is_done) {
+        if (within_month) {
           completed_days += 1;
         }
       });
@@ -106,6 +126,7 @@
 
   return {
     create_app_state,
+    has_habit_log_on,
     render_habit_list,
     set_error_message
   };

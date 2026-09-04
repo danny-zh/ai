@@ -18,13 +18,54 @@
           <button id="theme-toggle" class="secondary-button theme-toggle" type="button" aria-label="Toggle dark mode">
             Dark mode
           </button>
+          <span id="current-username" class="current-username" hidden></span>
+          <button id="logout-button" class="secondary-button" type="button" hidden>Logout</button>
           <button id="add-habit-button" class="primary-button" type="button">Add habit</button>
         </div>
       </header>
 
       <p id="error-message" class="error-message" aria-live="polite"></p>
 
-      <main class="layout">
+      <section id="auth-view" class="auth-view" aria-label="Account access">
+        <div class="panel auth-panel">
+          <div class="auth-mode-toggle" aria-label="Authentication mode">
+            <button id="show-login" class="secondary-button" type="button" aria-pressed="true">Login</button>
+            <button id="show-register" class="secondary-button" type="button" aria-pressed="false">Register</button>
+          </div>
+
+          <form id="login-form" class="auth-form">
+            <h2>Log in</h2>
+            <label>
+              <span>Username</span>
+              <input name="username" type="text" autocomplete="username" required />
+            </label>
+            <label>
+              <span>Password</span>
+              <input name="password" type="password" autocomplete="current-password" required />
+            </label>
+            <button class="primary-button" type="submit">Log in</button>
+          </form>
+
+          <form id="register-form" class="auth-form" hidden>
+            <h2>Create account</h2>
+            <label>
+              <span>Username</span>
+              <input name="username" type="text" autocomplete="username" maxlength="100" required />
+            </label>
+            <label>
+              <span>Email</span>
+              <input name="email" type="email" autocomplete="email" maxlength="254" required />
+            </label>
+            <label>
+              <span>Password</span>
+              <input name="password" type="password" autocomplete="new-password" minlength="8" maxlength="128" required />
+            </label>
+            <button class="primary-button" type="submit">Create account</button>
+          </form>
+        </div>
+      </section>
+
+      <main id="app-view" class="layout" hidden>
         <aside class="panel sidebar">
           <div class="section-header">
             <h2>Habits</h2>
@@ -41,6 +82,11 @@
             <label>
               <span>Color</span>
               <input id="habit-color" name="color" type="color" value="#4f46e5" />
+            </label>
+
+            <label>
+              <span>Description</span>
+              <input id="habit-description" name="description" type="text" maxlength="240" placeholder="Optional note" />
             </label>
 
             <button class="primary-button" type="submit">Save habit</button>
@@ -64,7 +110,8 @@
     </div>
 
     <script src="./utils/date_utils.js"></script>
-    <script src="./models/habit.js"></script>
+    <script src="./services/auth_session.js"></script>
+    <script src="./services/auth_api.js"></script>
     <script src="./services/habit_api.js"></script>
     <script src="./src/calendar_view.js"></script>
     <script src="./src/app.js"></script>
