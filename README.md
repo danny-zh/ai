@@ -15,8 +15,10 @@ export JWT_SECRET_KEY='generate-a-long-random-secret-for-local-use'
 make up-habit-tracker
 ```
 
-The API is available at `http://localhost:8001`. Stop the stack with
-`make down-habit-tracker`, or follow its logs with `make logs-habit-tracker`.
+The frontend is available at `http://localhost:8000`, and the API is available
+at `http://localhost:8001`. Stop the stack with `make down-habit-tracker`, or
+follow its logs with `make logs-habit-tracker`. The app-wide aliases
+`make up-app`, `make down-app`, and `make logs-app` run the same full stack.
 The MySQL service is private to the Compose network. FastAPI's interactive API
 documentation is available at `http://localhost:8001/docs`.
 
@@ -61,5 +63,7 @@ The MySQL initialization scripts run only for an empty `habitdb_data` volume. To
 reset local sample data, run `docker compose down --volumes` and then start the
 stack again with `make up-habit-tracker` and the required environment variables.
 
-The existing browser frontend is not yet compatible with this authenticated API:
-it does not register/log in, send bearer tokens, or load separate log records.
+The browser frontend registers and logs in users against the API, stores the
+returned bearer token locally, sends authenticated habit/log requests, and keeps
+habit logs as backend-shaped records. Start the full app with
+`make up-habit-tracker` or `make up-app`, then open `http://localhost:8000`.

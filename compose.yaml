@@ -20,5 +20,13 @@ services:
     ports:
       - "8001:8001"
 
+  frontend:
+    build:
+      context: ./app/frontend
+    depends_on:
+      - backend
+    ports:
+      - "8000:80"
+
 volumes:
   habitdb_data:

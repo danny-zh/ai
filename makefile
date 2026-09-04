@@ -1,4 +1,4 @@
-.PHONY: run-ollama rm-ollama build-copilot-image run-copilot rm-copilot rm-copilot-image test-database up-habit-tracker down-habit-tracker logs-habit-tracker test-backend
+.PHONY: run-ollama rm-ollama build-copilot-image run-copilot rm-copilot rm-copilot-image test-database up-app down-app logs-app up-habit-tracker down-habit-tracker logs-habit-tracker test-backend
 .SHELL := /bin/bash
 
 OLLAMA_PORT=11434
@@ -9,14 +9,20 @@ PYTHON ?= .venv/bin/python
 test-database:
 	$(PYTHON) -m pytest app/database/test/test_database.py -v
 
-up-habit-tracker:
+up-app:
 	docker compose up --build --detach
 
-down-habit-tracker:
+down-app:
 	docker compose down
 
-logs-habit-tracker:
+logs-app:
 	docker compose logs --follow
+
+up-habit-tracker: up-app
+
+down-habit-tracker: down-app
+
+logs-habit-tracker: logs-app
 
 test-backend:
 	$(PYTHON) -m pytest app/backend/test -v
