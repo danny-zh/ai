@@ -1,0 +1,24 @@
+services:
+  database:
+    build:
+      context: ./app/database
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD must be set}
+    volumes:
+      - habitdb_data:/var/lib/mysql
+
+  backend:
+    build:
+      context: .
+      dockerfile: app/backend/Dockerfile
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: mysql+pymysql://root:${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD must be set}@database:3306/habitdb
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?JWT_SECRET_KEY must be set}
+    ports:
+      - "8001:8001"
+
+volumes:
+  habitdb_data:
